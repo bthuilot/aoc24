@@ -35,7 +35,7 @@ To test functionaility of the project, invoke the following:
 ```bash
 make test
 # Or
-raco test
+raco test .
 ```
 
 ## Completed Days
