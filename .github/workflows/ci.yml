@@ -1,0 +1,34 @@
+on:
+  pull_request:
+  push:
+    branches:
+      - 'main'
+
+name: CI
+jobs:
+  build:
+    name: "Build on Racket '${{ matrix.racket-version }}' (${{ matrix.racket-variant }})"
+    runs-on: ubuntu-latest
+    continue-on-error: ${{ matrix.experimental || false }}
+    strategy:
+      fail-fast: false
+      matrix:
+        racket-version: ["stable"] # ["stable", "current"]
+        racket-variant: ["CS"] # ["BC", "CS"]
+        # include:
+          # - racket-version: current
+            # experimental: true
+    steps:
+      - uses: actions/checkout@v4.2
+      - uses: Bogdanp/setup-racket@v1.11
+        with:
+          architecture: arm64
+          distribution: full
+          variant: ${{ matrix.racket-variant }}
+          version: ${{ matrix.racket-version }}
+      - name: Installing aoc24 and its dependencies
+        run: raco pkg install --no-docs --auto --name aoc24
+      - name: Compiling aoc24 and building its docs
+        run: raco setup --check-pkg-deps --unused-pkg-deps aoc24
+      - name: Testing aoc24
+        run: raco test -x -p aoc24
