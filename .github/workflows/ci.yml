@@ -19,7 +19,7 @@ jobs:
           # - racket-version: current
             # experimental: true
     steps:
-      - uses: actions/checkout@v4.2
+      - uses: actions/checkout@v4
       - uses: Bogdanp/setup-racket@v1.11
         with:
           architecture: arm64
