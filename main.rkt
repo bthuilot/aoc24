@@ -1,12 +1,16 @@
 #lang racket/base
 
+; Racket imports
 (require racket/format)
 (require racket/file)
 (require racket/match)
 (require racket/exn)
+(require racket/string)
+(require racket/cmdline)
 
-(module+ test
-  (require rackunit))
+; Relative imports
+(require "private/solution.rkt")
+(require "private/display.rkt")
 
 
 ;; This is the header that will be displayed when the program is run
@@ -19,59 +23,61 @@
 EOF
   )
 
-; Day -> Pair String String
+; print-err: Exn -> Void
+; Prints the error message of an exception
+(define (print-err e)
+  (let [(msg (exn-message e))]
+    (displayln (string-append "ERROR: " msg))))
+
+; main: Listof Day -> Void
+; Runs the main program for the advent of code
+(define (main days)
+  (displayln header)
+  (for [(day days)]
+    (printf "= Running day ~a =~n" day)
+    (with-handlers ([exn:fail? print-err])
+      (let* ([solution (run-day day)]
+             [solution-str (solution->string solution)]
+             [indent-solution (indent solution-str)])
+        (displayln indent-solution)))))
+
+
+; run-day: Day -> Solution
+; Runs the solution for a given day by importing the module
+; and running the run function
 (define (run-day day)
   (let* ([formatted-number (~r day #:min-width 2 #:pad-string "0")]
-         [module-path (format "days/~a.rkt" formatted-number)]
+         [module-path (format "private/days/~a.rkt" formatted-number)]
          [input-path (format "inputs/~a.txt" formatted-number)])
-
+    ;; Check if the module exists
     (unless (file-exists? module-path)
       (error (format "day ~a not implemented" day)))
-    ;; read from input file
-    (define input (file->string input-path))
-    
-    (define run (dynamic-require module-path 'run (λ () (error 'main "unable to load day ~a, please implement run function" day))))
-    (run input)))
+    ;; Check if the input exists
+    (unless (file-exists? input-path)
+      (error (format "day ~a input not found" day)))
+    ;; import the module and run the function
+    (define run
+      (dynamic-require module-path
+                       'run
+                       (λ () (error 'main "unable to load day ~a, please implement run function" day)))
+      )
+    ;; Run the function with the input
+    (run (file->string input-path))))
 
 
 
 (module+ main
-  (require racket/cmdline)
-  (require racket/string)
-  (define selected-days (box '()))
+  (define selected-days (box (build-list 25 add1)))
   (command-line
     #:program "aoc-2024"
     #:once-each
     [("-d" "--days") days "A whitelist of AOC day challenges to run"
                      (set-box! selected-days (map string->number (string-split days ",")))]
     #:args ()
-    (define days (let ([days (unbox selected-days)])
-                   (if (null? days)
-                       (begin
-                         (printf "No days selected, running all days~n")
-                         (build-list 25 add1))
-                       days)))
-    ;; Check to make sure the days are valid
-    ;; 0 is a valid day, but it is not a valid day for AOC
-    (or (not (member (λ (x) (and (integer? x) (<= 0 x) (<= x 25))) days))
-        (error "invalid days given, must be a list of integers between 1 and 25 inclusive"))
+    (let [(days (unbox selected-days))]
+      (or (not (member (λ (x) (and (integer? x) (<= 0 x) (<= x 25))) days))
+          ;; 0 is a test day, so it is considered valid
+          ;; but the error message doesn't include it since its not valid for AOC
+          error "invalid days given, must be a list of integers between 1 and 25 inclusive")
+      (main days))))
 
-    (displayln header)
-    
-    (for [(day days)]
-      ;; Run the day
-      (printf "= Running day ~a =~n" day)
-      (with-handlers ([exn:fail? (λ (e) (displayln (string-append "  " (exn-message e))) (void))])
-        (let ([results (run-day day)])
-          (match results
-            [(cons (? string?) (? string?)) (printf "  part1: ~a~n  part2: ~a~n"
-                                                    (car results)
-                                                    (cdr results))]
-            [(cons (? string?) _) (printf "  part1: ~a~n  part2: not implemented~n" (car results))]
-            [(cons _ (? string?)) (printf "  part1: not implemented~n  part2: ~a~n" (cdr results))]
-            [_ (printf "  part1: not implemented~n  part2: not implemented~n")])))
-      (displayln ""))))
-
-
-;; (module+ test
-;;   (check-equal? (+ 2 2) 4))

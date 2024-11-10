@@ -12,8 +12,10 @@ second string is the solution to the second part of the problem.
 
 #lang racket/base
 
-
+; Racket imports
 (require racket/string)
+; Relative imports
+(require "../solution.rkt")
 
 (provide run)
 
@@ -23,10 +25,13 @@ second string is the solution to the second part of the problem.
 (define (run input)
   (let ([part1 input]
         [part2 (string-upcase input)])
-    (cons part1 part2)))
+    (full-solution part1 part2)))
 
 (module+ test
   (require rackunit)
   
-  (check-equal? (run "input") (cons "input" "INPUT")))
+  ; Test the run function
+  (check-equal?
+   (run "input")
+   (full-solution "input" "INPUT")))
 
