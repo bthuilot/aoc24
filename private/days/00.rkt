@@ -20,7 +20,7 @@ second string is the solution to the second part of the problem.
 (provide run)
 
   
-;; Run: string -> cons
+;; Run: string -> Solution
 ;; Run the solution to the problem
 (define (run input)
   (let ([part1 input]

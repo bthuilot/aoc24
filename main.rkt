@@ -11,6 +11,7 @@
 ; Relative imports
 (require "private/solution.rkt")
 (require "private/display.rkt")
+(require "private/template.rkt")
 
 
 ;; This is the header that will be displayed when the program is run
@@ -68,12 +69,20 @@ EOF
 
 (module+ main
   (define selected-days (box (build-list 25 add1)))
+  (define generate-day (box null))
   (command-line
     #:program "aoc-2024"
-    #:once-each
+    #:once-any
+    [("-g" "--generate") day "Generate a new day from the template"
+                       (set-box! generate-day day)]
     [("-d" "--days") days "A whitelist of AOC day challenges to run"
                      (set-box! selected-days (map string->number (string-split days ",")))]
     #:args ()
+    (if (not (null? (unbox generate-day)))
+        (begin
+          (create-day-file (unbox generate-day))
+          (exit))
+        (void))
     (let [(days (unbox selected-days))]
       (or (not (member (λ (x) (and (integer? x) (<= 0 x) (<= x 25))) days))
           ;; 0 is a test day, so it is considered valid
