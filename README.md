@@ -43,7 +43,7 @@ raco test .
 Below is an index to every completed day's implementation source code (containing documentation of approach) and the challenge for the day
 
 - [Day 0](private/days/00.rkt) : *This is a test day supposed to server a placeholder until the challenge starts*
-<!-- - [Day 1](private/days/01.rkt) : [Problem](https://adventofcode.com/2024/day/1) -->
+- [Day 1](private/days/01.rkt) : [Problem](https://adventofcode.com/2024/day/1)
 <!-- - [Day 2](private/days/02.rkt) : [Problem](https://adventofcode.com/2024/day/2) -->
 <!-- - [Day 3](private/days/03.rkt) : [Problem](https://adventofcode.com/2024/day/3) -->
 <!-- - [Day 4](private/days/04.rkt) : [Problem](https://adventofcode.com/2024/day/4) -->
