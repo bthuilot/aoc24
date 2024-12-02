@@ -16,12 +16,15 @@ https://adventofcode.com/2024/day/~a
 
 #lang racket/base
 
+
 (require "../solution.rkt")
+
+(provide run)
 
 (define (run input)
   (let ([part1 null]
         [part2 null])
-    ())
+    (null)))
 
 
 ;; (module+ test
