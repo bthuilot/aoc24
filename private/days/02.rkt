@@ -25,20 +25,28 @@ https://adventofcode.com/2024/day/02
 
 (define (same-sign? new-sign old-sign)
   (or (equal? old-sign 'no-sign)
-       (equal? old-sign new-sign)))
+      (equal? old-sign new-sign)))
 
-(define (safe-level? level)
+(define (valid-diff? num next old-sign)
+  (let* ([diff (- num next)]
+         [sign (if (> diff 0) 'increase 'decrease)]
+         [abs-diff (abs diff)])
+    (and (< abs-diff 4) (> abs-diff 0)
+         (same-sign? sign old-sign))))
+
+(define (safe-level? level [one-off #f])
   (letrec ([safe-level
             (λ (l s)
               (cond
                 [(empty? l) 0]
                 [(equal? (length l) 1) 0]
-                [else (let* ([diff (- (cadr l) (car l))]
-                             [sign (if (> diff 0) 'increase 'decrease)]
-                             [abs-diff (abs diff)])
-                        (+ (if (and (< abs-diff 4) (> abs-diff 0)
-                                    (same-sign? sign s))
-                               0 1)
+                [else (let* [
+                 ;; (let* ([diff (- (cadr l) (car l))]
+                 ;;             [sign (if (> diff 0) 'increase 'decrease)]
+                 ;;             [abs-diff (abs diff)])
+                 ;;        (+ (if (and (< abs-diff 4) (> abs-diff 0)
+                 ;;                    (same-sign? sign s))
+                 ;;               0 1)
                            (safe-level (cdr l) sign)))]))])
     (safe-level level 'no-sign)))
          
@@ -73,7 +81,7 @@ EOF
   (check-equal? (safe-level? '(7 6 4 2 1)) #t)
   (check-equal? (safe-level? '(1 2 7 8 9)) #f)
   (check-equal? (safe-level? '(9 7 6 2 1)) #f)
-  (check-equal? (safe-level? '(1 3 2 4 5)) #f)
-  (check-equal? (safe-level? '(8 6 4 4 1)) #f)
+  (check-equal? (safe-level? '(1 3 2 4 5)) #t)
+  (check-equal? (safe-level? '(8 6 4 4 1)) #t)
   (check-equal? (safe-level? '(1 3 6 7 9)) #t)
   )
