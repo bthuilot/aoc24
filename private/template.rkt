@@ -1,6 +1,7 @@
 #lang racket/base
 
 (require racket/format)
+(require racket/file)
 (require "./display.rkt")
 
 (provide create-day-file)
@@ -24,7 +25,7 @@ https://adventofcode.com/2024/day/~a
 (define (run input)
   (let ([part1 null]
         [part2 null])
-    (null)))
+    null))
 
 
 ;; (module+ test
@@ -36,8 +37,10 @@ EOF
 (define (create-day-file num)
   (let* ([formatted-num (pad num #\0 2)]
          [module-path (format "private/days/~a.rkt" formatted-num)]
+         [input-path (format "inputs/~a.txt" formatted-num)]
          [template   (format day-template num formatted-num)])
     (if (file-exists? module-path)
         (error "not generating new day, file already exists")
         (void))
-    (with-output-to-file module-path (λ () (display template)))))
+    (with-output-to-file module-path (λ () (display template)))
+    (display-to-file "" input-path)))
