@@ -1,24 +1,33 @@
 #lang racket/base
 
 ; Provides
-(provide solution->string)
-(provide full-solution)
-(provide part1-solution)
-(provide part2-solution)
+(provide
+ ;; Solution -> String
+ solution->string
+ ;; (full-solution Any Any)
+ full-solution
+ ;; (part1-solution String)
+ part1-solution
+ ;; (part2-solution String)
+ 
+ part2-solution)
 
-; A Solution is one of:
-; - (make-full-solution String String)
-; - (make-part1-solution String)
-; - (make-part2-solution String)
-; Interpretation:
-;; - A full-solution is a pair of strings, the first representing the solution to part 1 and the second representing the solution to part 2.
+
+;; Solution = 
+;; (full-solution Any Any) |
+;; (part1-solution Any) |
+;; (part2-solution Any)
+
+
+;; Represents the full solution to problem
 (struct full-solution (part1 part2) #:transparent)
-;; - A part1-solution is a string representing the solution to part 1.
+;; Represents a solution to only part 1 of the problem
 (struct part1-solution (result) #:transparent)
-;; - A part2-solution is a string representing the solution to part 2.
+;; Represents a solution to only part 2 of the problem
 (struct part2-solution (result) #:transparent)
 
-
+;; Solution -> String
+;; Formats the solution output to a human readable string
 (define (solution->string solution)
   (cond
     [(full-solution? solution)

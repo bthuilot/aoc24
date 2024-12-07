@@ -10,10 +10,11 @@
 
 ; Relative imports
 (require "private/solution.rkt")
-(require "private/display.rkt")
 (require "private/template.rkt")
+(require "private/utils/display.rkt")
 
 
+;; String
 ;; This is the header that will be displayed when the program is run
 (define header #<<EOF
 ##################
@@ -24,28 +25,27 @@
 EOF
   )
 
-; print-err: Exn -> Void
-; Prints the error message of an exception
+;; Exn -> Void
+;; Prints the error message of an exception
 (define (print-err e)
-  (let [(msg (exn-message e))]
-    (displayln (string-append "ERROR: " msg))))
+  (define msg (exn-message e))
+  (displayln (string-append "ERROR: " msg)))
 
-; main: Listof Day -> Void
-; Runs the main program for the advent of code
+;; [Listof Day]) -> Void
+;; Runs the main program for the advent of code
 (define (main days)
   (displayln header)
   (for [(day days)]
     (printf "= Running day ~a =~n" day)
-    (with-handlers ([exn:fail? print-err])
-      (let* ([solution (run-day day)]
-             [solution-str (solution->string solution)]
-             [indent-solution (indent solution-str)])
-        (displayln indent-solution)))))
+    (with-handlers
+      ([exn:fail? print-err])
+      (define solution (solution->string (run-day day)))
+      (displayln (indent solution)))))
 
 
-; run-day: Day -> Solution
-; Runs the solution for a given day by importing the module
-; and running the run function
+;; Day -> Solution
+;; Runs the solution for a given day by importing the module
+;; and running the run function
 (define (run-day day)
   (let* ([formatted-number (~r day #:min-width 2 #:pad-string "0")]
          [module-path (format "private/days/~a.rkt" formatted-number)]

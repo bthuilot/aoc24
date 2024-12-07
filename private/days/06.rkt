@@ -38,14 +38,10 @@ since I wouldnt have gotten to the current point if it was blocked.
 (require racket/set)
 (require racket/match)
 (require "../solution.rkt")
+(require "../utils/point.rkt")
+(require "../utils/matrix.rkt")
 
 (provide run)
-
-;; a point represents an x y coordinate
-(struct point (x y) #:transparent)
-
-(define (translate p dx dy)
-  (point (+ (point-x p) dx) (+ (point-y p) dy)))
 
 ;; a visited-map is a set of visited points
 ;; represneted by a hash table that maps points
@@ -93,11 +89,6 @@ since I wouldnt have gotten to the current point if it was blocked.
     ['east (translate p 1 0 )]
     ['south (translate p 0 1)]
     ['west (translate p -1 0)]))
-
-;; matrix-point :: [List-of [List-of any]] point -> any
-;; matrix-ref but using point for x and y
-(define (matrix-point m p)
-  (list-ref (list-ref m (point-y p)) (point-x p)))
 
 ;; in-bounds? [List-of [List-of any]] point -> boolean
 (define (in-bounds? m p)
@@ -211,7 +202,6 @@ since I wouldnt have gotten to the current point if it was blocked.
 EOF
     )
 
-  ;; (define parsed (parse-input example-input))
   (define example-lab (parse-lab example-input))
   (define example-point (find-guard example-lab))
 
