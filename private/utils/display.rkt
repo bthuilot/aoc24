@@ -4,7 +4,7 @@
 
 (provide indent pad)
 
-; Indent : String [Number] -> String
+; String [Number] -> String
 ; Indent a string by a given amount
 ; str: The string to indent
 ; amt: The amount to indent by
@@ -15,7 +15,7 @@
      (string-replace
       str "\n" (string-append "\n" i)))))
 
-;; pad : String Char Number -> String
+;; String Char Number [Boolean] -> String
 ;; Pad a string with a given character to a given length
 ;; str: The string to pad
 ;; chr: The character to pad with

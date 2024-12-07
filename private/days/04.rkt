@@ -29,15 +29,12 @@ parts using the 2nd function.
 (require racket/string)
 (require racket/list)
 (require "../solution.rkt")
+(require "../utils/point.rkt")
+(require "../utils/matrix.rkt")
 
 (provide run)
 
-;; A matrix is a [[any]]
-
 ;; A wordsearch is a [[characters]]
-
-;; A point that represents an x y coordinate
-(struct point (x y) #:transparent)
 
 ;; string->wordsearch :: string -> wordsearch
 ;; Parses a string into a wordsearch. First the string
@@ -52,13 +49,7 @@ parts using the 2nd function.
 ;; creates a direction that will translate a point by dx on the
 ;; x-axis and dy on the y-axis
 (define (create-direction dx dy)
-  (λ (p) (translate-point p dx dy)))
-
-;; translate-point :: point integer integer -> point
-;; translates a given point by dx on the x-axis and
-;; dy on the y axis
-(define (translate-point p dx dy)
-  (point (+ (point-x p) dx) (+ (point-y p) dy)))
+  (λ (p) (translate p dx dy)))
 
 ;; in-bounds? :: matrix -> point
 ;; checks if a point is in the bounds of a given matrix
@@ -67,13 +58,6 @@ parts using the 2nd function.
        (> (length (car m)) (point-x p))
        (<= 0 (point-x p))
        (<= 0 (point-y p))))
-
-;; matrix-ref :: matrix integer integer -> any
-;; returns the element of the matrix at (x,y) where y
-;; is zero indexed from the top level list and x is
-;; zero indexed from the sub lists
-(define (matrix-ref m x y)
-  (list-ref (list-ref m y) x))
 
 ;; word-match :: wordsearch [characters] point direction -> boolean
 ;; matches the letters in the correct order starting at
@@ -93,12 +77,12 @@ parts using the 2nd function.
 (define (count-words wordsearch words-at-point)
   (letrec ([search (λ (ws p acc)
                      (if (empty? ws) acc
-                         (search (cdr ws) (translate-point p 0 1)
+                         (search (cdr ws) (translate p 0 1)
                                  (+ (search-row (car ws) p 0) acc))
                          ))]
            [search-row (λ (row p acc)
                          (if (empty? row) acc
-                             (search-row (cdr row) (translate-point p 1 0) (+ acc (words-at-point wordsearch p)))))])
+                             (search-row (cdr row) (translate p 1 0) (+ acc (words-at-point wordsearch p)))))])
     (search wordsearch (point 0 0) 0)
     ))
 
@@ -124,10 +108,10 @@ parts using the 2nd function.
 ;; will count the point if is the 'A' of the cross
 (define (x-mas-at-point ws p)
   (let ([letters (string->list "MAS")])
-    (if (and (or (word-match ws letters (translate-point p 1 1) (create-direction -1 -1))
-                 (word-match ws letters (translate-point p -1 -1) (create-direction 1 1)))
-             (or (word-match ws letters (translate-point p -1 1) (create-direction 1 -1))
-                 (word-match ws letters (translate-point p 1 -1) (create-direction -1 1))))
+    (if (and (or (word-match ws letters (translate p 1 1) (create-direction -1 -1))
+                 (word-match ws letters (translate p -1 -1) (create-direction 1 1)))
+             (or (word-match ws letters (translate p -1 1) (create-direction 1 -1))
+                 (word-match ws letters (translate p 1 -1) (create-direction -1 1))))
         1
         0)))
 

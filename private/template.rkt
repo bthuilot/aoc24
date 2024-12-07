@@ -2,7 +2,7 @@
 
 (require racket/format)
 (require racket/file)
-(require "./display.rkt")
+(require "utils/display.rkt")
 
 (provide create-day-file)
 
