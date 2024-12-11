@@ -23,6 +23,9 @@
 
  ;; Point Slope -> Point
  translate-slope
+
+ ;; Point -> [Listof Point]
+ cardinal-points
  )
 
 ;; a point represents an x y coordinate
@@ -46,3 +49,9 @@
 (define (negate-slope s)
   (slope (* -1 (slope-dx s))
          (* -1 (slope-dy s))))
+
+(define (cardinal-points p)
+  (list (translate p 1 0)
+        (translate p 0 1)
+        (translate p -1 0)
+        (translate p 0 -1)))
