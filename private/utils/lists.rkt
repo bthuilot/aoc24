@@ -18,4 +18,3 @@
            (define applied (foldl (fold (car ls)) '() (cdr ls)))
            (helper f (cdr ls) (append applied acc))]))
   (helper func l '()))
-    

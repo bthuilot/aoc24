@@ -29,6 +29,7 @@ in my head, so a refactor is definitely needed for it to be readable.
 (require racket/list)
 (require racket/set)
 (require "../solution.rkt")
+(require "../utils/strings.rkt")
 
 (provide run)
 
@@ -50,12 +51,8 @@ in my head, so a refactor is definitely needed for it to be readable.
 ;; and #f represents free space
 
 
-(define (char->number c)
-  (- (char->integer c) 48))
-
 (define (parse-disk-map input)
   (map char->number (string->list input)))
-  
 
 ;; DiskMap -> Disk
 ;; parses a disk map into the actual contents of the disk
