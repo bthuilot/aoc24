@@ -114,7 +114,7 @@ Ran in 2 seconds :/
   (check-equal? (blink-stone 125)
                 '(253000))
   (check-equal? (blink-stone 17)
-                (1 7))
+                '(1 7))
   
   (check-equal? (count-stones-after stones 25)
                 55312)
