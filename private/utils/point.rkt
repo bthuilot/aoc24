@@ -25,7 +25,13 @@
  translate-slope
 
  ;; Point -> [Listof Point]
+ ordinal-points
+
+ ;; Point -> [Listof Point]
  cardinal-points
+ 
+ ;; Point -> [Listof Point]
+ surrounding-points
 
  ;; Direction is one of
  ;; 'north
@@ -69,19 +75,39 @@
   (slope (* -1 (slope-dx s))
          (* -1 (slope-dy s))))
 
+
+;; Point -> [Listof Point]
+;; returns all the surrounding
+;; points of the given point
+;; both cardinally and ordinally
+(define (surrounding-points p)
+  (append (cardinal-points p)
+          (ordinal-points p)))
+
 ;; Point -> [Listof Point]
 ;; returns all the cardinally surrounding
-;; points of the given point 
+;; points of the given point
 (define (cardinal-points p)
   (list (translate p 1 0)
         (translate p 0 1)
         (translate p -1 0)
         (translate p 0 -1)))
 
+;; Point -> [Listof Point]
+;; returns all the ordinally surrounding
+;; points of the given point
+(define (ordinal-points p)
+  (list (translate p 1 1)
+        (translate p -1 -1)
+        (translate p -1 1)
+        (translate p 1 -1)))
+
+;; Point -> [Listof [Pairof Point Direction]]
+;; returns all the cardinally surrounding
+;; points and their direction
 (define (cardinal-points-dir p)
   (list (cons (translate p 1 0) 'east)
         (cons (translate p 0 1) 'south)
         (cons (translate p -1 0) 'west
               )
         (cons (translate p 0 -1) 'north)))
-
