@@ -16,7 +16,7 @@
  ;; [<A> <T> -> <A>] <A> [Matrixof <T>] -> <A>
  matrix-fold
 
- ;; [Point <A> <T> -> <A>] <A> [Matrixof <T>] -> <A>
+ ;; [Point <T> <A> -> <A>] <A> [Matrixof <T>] -> <A>
  matrix-fold-point
  )
 
@@ -68,7 +68,7 @@
   (foldl fold-rows acc matrix))
 
 
-;; [Point <A> <T> -> <A>] <A> [Matrixof <T>] -> <A>
+;; [Point <T> <A> -> <A>] <A> [Matrixof <T>] -> <A>
 ;; folds over all values in a matrix.
 ;; Same as matrix-fold but additionally calls
 ;; with a Point representing the coordinate in the matrix
