@@ -3,6 +3,24 @@
 Day 12
 https://adventofcode.com/2024/day/12
 
+So, the first part was easy (relatively)
+for each point see how many adjancent points are also
+the same plot (area) and how many points are not (permimeter).
+
+Part 2 then stumped me... for like 5 days.
+I eventually settled on recording the direction
+it took to get to each border point and when calculating
+sides, for each border reached from the same direction:
+1. group them by the perpendicular axis (to make sure they would
+be next to each other)
+2. sort them based on the parellel axis (so the coordinates
+should be increasing)
+3. group them by adjancent (coordinates only change by 1),
+and count the amount of groups
+
+Is this the "correct" solution, probably not
+but again, this is 5 days late so just rolling with it
+
 |#
 
 #lang racket/base
@@ -24,123 +42,107 @@ https://adventofcode.com/2024/day/12
 (define (parse-farm input)
   (map string->list (string-split input)))
 
+;; (measured [Setof Point] [Listof [Pairof Point Direction]])
+;; Represents the fenced points of a plot of land
+;; and their borders paired with the direction from the
+;; plot of land it came from
+(struct measured (fenced borders) #:transparent)
 
-(struct measure (area perm) #:transparent)
+;; Measured -> Number
+;; Calculates the cost to fence
+;; a plot of land based on part 1
+(define (cost-f-part1 m)
+  (* (set-count (measured-fenced m))
+     (length (measured-borders m))))
 
-(define (combine-measure m1 m2)
-  (measure (+ (measure-area m1) (measure-area m2))
-           (+ (measure-perm m1) (measure-perm m2))))
-
-(define (measure-cost m)
-  (* (measure-area m)
-     (measure-perm m)))
-
-#;(define (condense-points ps)
-  (define (find-home p existing)
-    (ormap (λ (adj)
-             (or (and (= (point-x p) (point-x adj))
-                      (= 1 (abs (- (point-y p) (point-y adj)))))
-                 (and (= (point-y p) (point-y adj))
-                      (= 1 (abs (- (point-x p) (point-x adj)))))))
-           existing))
-  (define unique (list->set ps))
-  (foldl (λ (p acc)
-           (define r (foldl (λ (exisiting a)
-                              (define prev (car a))
-                              (define found (cdr a))
-                              (cond
-                                [found (cons (cons exisiting prev) found)]
-                                [(find-home p exisiting) (cons (cons (cons p exisiting) prev)
-                                                    #t)]
-                                [else (cons (cons exisiting prev) found)]))
-                            (cons '() #f)
-                            acc))
-           (define groups (car r))
-           (define found (cdr r))
-           (if (not found) (cons '(p) acc)
-               acc))
-             
-         '()
-         unique))
+;; Measured -> Number
+;; Calculates the cost to fence
+;; a plot of land based on part 2
+(define (cost-f-part2 m)
+  (define (check axis1 axis2 p)
+    (define grouped (map
+                     (compose (λ (l) (sort l <)) ((curry map) axis1))
+                     (group-by axis2 p)))
+    (define (count-adj x xs)
+      (cond
+        [(empty? xs) 1]
+        [(not (= (abs (- x (car xs))) 1)) (+ 1 (count-adj (car xs) (cdr xs)))]
+        [else (count-adj (car xs) (cdr xs))]
+        )
+      )
+    (apply + (map (λ (l) (count-adj (car l) (cdr l))) grouped))
+    )
   
-
-(define (measure-discount-cost m)
-  (* (measure-area m)
-     (+ 4 (* 2 (- (measure-perm m) 4)))))
-
-
-;; (struct measure (area perm) #:transparent)
-
-;; (define (combine-measure m1 m2)
-;;   (measure (+ (measure-area m1) (measure-area m2))
-;;            (+ (measure-perm m1) (measure-perm m2))))
-
-;; (define (measure-cost m)
-;;   (* (measure-area m)
-;;      (measure-perm m)))
-
-(define (perm-m-f1 outs)
-  (length outs))
-
-(define (perm-m-f2 outs)
-  (define l (length outs))
-  (cond
-    [(= l 4) 4]
-    [(= l 3) 2]
-    [(< l 2) 0]
-    [else
-     (define p1 (car outs))
-     (define p2 (cadr outs))
-     (define s (slope-of p1 p2))
-     (if (and (= (abs (slope-dx s)) 1)
-              (= (abs (slope-dy s)) 1))
-         1
-         0)]))
-(define (fence-cost farm cost-f perm-m-f)
-  (define ((same-plot? plot) point)
-    (and (in-bounds? farm point)
-         (equal? plot (matrix-point farm point))))
-  (define (measure-plot fenced point plot)
-    (define-values (in out) (partition (same-plot? plot) (cardinal-points point)))
-
-    (define a (foldl (λ (adj a)
-                       (define f (car a))
-                       (define measures (cdr a))
-                       (define adj-plot (matrix-point farm adj))
-                       (cond
-                         [(set-member? f adj) a]
-                         [else
-                          (define adj-acc (measure-plot f adj adj-plot))
-                          (define adj-measure (cdr adj-acc))
-                          (cons (car adj-acc) (combine-measure adj-measure measures))]))
-                     (cons (set-add fenced point) (measure 1 (perm-m-f out)))
-                     in))
-    a)
+  (define horizontal-check ((curry check) point-x point-y))
   
-  (struct acc (fenced cost))
-  (define (fold point plot a)
-    (define fenced (acc-fenced a))
-    (define cost (acc-cost a))
+  (define vertical-check ((curry check) point-y point-x))
+  
+  (define (find-sides borders)
+    (define ((filter-dir dir) b) (equal? dir (cdr b)))
+    (define east (filter (filter-dir 'east) borders))
+    (define west (filter (filter-dir 'west) borders))
+    (define north (filter (filter-dir 'north) borders))
+    (define south (filter (filter-dir 'south) borders))
+    
+    (+ (horizontal-check (map car north))
+       (horizontal-check (map car south))
+       (vertical-check (map car east))
+       (vertical-check (map car west))))
+  
+  (* (set-count (measured-fenced m))
+     (find-sides (measured-borders m))))
+
+;; Farm Character Point -> Boolean
+;; returns true of the given point
+;; is the same plot type as the given plot
+;; and within bounds of the farm
+(define ((same-plot? farm plot) point)
+  (and (in-bounds? farm point)
+       (equal? plot (matrix-point farm point))))
+
+
+;; Farm [Measure -> Number] -> Number
+;; Calculates the cost to fence the plots
+;; on the farm. Uses [cost-f] to determine
+;; the cost of a particular plot of land
+;; by its measured
+(define (cost farm cost-f)
+  ; returns the Measured for a plot
+  (define ((measure-plot plot) point m)
+    (define-values (same-plot-dir borders-dir)
+      (partition
+       (compose (same-plot? farm plot) car)
+       (cardinal-points-dir point)))
+    (define b (append (measured-borders m) borders-dir))
+    (define next-plots
+      ; filter out visited
+      (filter (compose not ((curry set-member?) (measured-fenced m)))
+              ; remove direction
+              (map car same-plot-dir)))
+    (define f (set-union (measured-fenced m) (list->set next-plots)))
+    (foldl (measure-plot plot) (measured f b) next-plots))
+
+  ;; folds over all points in the farm and
+  ;; calculates the cost of fencing each plot
+  (define (foldf point plot acc)
+    (define fenced (car acc))
+    (define cost (cdr acc))
     (cond
-      [(set-member? fenced point) a]
+      [(set-member? fenced point) acc]
       [else
-       (define a (measure-plot fenced point plot))
-       (define plots (car a))
-       (define measures (cdr a))
-       (print plot) (print " ")(print point)
-       (displayln measures)
-       (acc plots (+ cost (cost-f measures)))]))
-  (define final (matrix-fold-point fold (acc (set) 0) farm))
-  (acc-cost final))
+       (define m ((measure-plot plot) point (measured (set point) '())))
+       (cons
+        (set-union fenced (measured-fenced m))
+        (+ cost (cost-f m)))]))
+
+  (cdr (matrix-fold-point foldf (cons (set) 0) farm)))
+
 
 (define (run input)
   (define farm (parse-farm input))
   (full-solution
-   (fence-cost farm measure-cost perm-m-f1)
-   (fence-cost farm measure-discount-cost perm-m-f2)
-   )
-  
-  )
+   (cost farm cost-f-part1)
+   (cost farm cost-f-part2)))
 
 
 (module+ test
@@ -194,21 +196,21 @@ EOF
                   (#\O #\X #\O #\X #\O)
                   (#\O #\O #\O #\O #\O)))
 
-  (check-equal? (fence-cost farm-1 measure-cost perm-m-f1)
+  (check-equal? (cost farm-1 cost-f-part1)
                 140)
 
-  (check-equal? (fence-cost farm-2 measure-cost perm-m-f1)
+  (check-equal? (cost farm-2 cost-f-part1)
                 772)
-  (check-equal? (fence-cost farm-3 measure-cost perm-m-f1)
+  (check-equal? (cost farm-3 cost-f-part1)
                 1930)
   
-  (check-equal? (fence-cost farm-1 measure-discount-cost perm-m-f2)
+  (check-equal? (cost farm-1 cost-f-part2)
                 80)
 
-  (check-equal? (fence-cost farm-2 measure-discount-cost perm-m-f2)
+  (check-equal? (cost farm-2 cost-f-part2)
                 436)
 
-  (check-equal? (fence-cost farm-3 measure-discount-cost perm-m-f2)
+  (check-equal? (cost farm-3 cost-f-part2)
                 1206)
   
 
