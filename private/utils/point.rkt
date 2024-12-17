@@ -26,6 +26,15 @@
 
  ;; Point -> [Listof Point]
  cardinal-points
+
+ ;; Direction is one of
+ ;; 'north
+ ;; 'south
+ ;; 'east
+ ;; 'west
+
+ ;; Point -> [Listof [Pairof Point Direction]]
+ cardinal-points-dir
  )
 
 ;; a point represents an x y coordinate
@@ -68,3 +77,11 @@
         (translate p 0 1)
         (translate p -1 0)
         (translate p 0 -1)))
+
+(define (cardinal-points-dir p)
+  (list (cons (translate p 1 0) 'east)
+        (cons (translate p 0 1) 'south)
+        (cons (translate p -1 0) 'west
+              )
+        (cons (translate p 0 -1) 'north)))
+
