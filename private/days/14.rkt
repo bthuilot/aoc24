@@ -15,14 +15,15 @@ Count each quadarent is just depedning on if the x/y
 coordinate is above or below the half way point.
 
 Now, part 2 gave **no hints** so my first idea
-was to try to 'wait' for 1 second, check if all points
+was to try to'wait' for 1 second, check if all points
 are connected, if not wait another and so on. That would
 not have worked so luckily I browsed reddit to see what
-exactly the "christmas tree" grid would look like. I got
+exactly the "christmas tree" grid would look like. I saw it was a christmas
+tree shape, outlined in a box of connected points so I got
 lazy and just counted the amount of points that are next
 to each other horizontally, then ran the program a few times
 changing the 'threshold' for count of adjancent points until
-I got my star (it was 100 adjancent points). 
+I got my star (it was 100 adjancent points).
 
 |#
 
