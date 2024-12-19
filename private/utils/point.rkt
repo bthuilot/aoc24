@@ -1,6 +1,5 @@
 #lang racket/base
 
-
 (provide
  ;; Point = (point Number Number)
  
@@ -41,6 +40,9 @@
 
  ;; Point -> [Listof [Pairof Point Direction]]
  cardinal-points-dir
+
+ ;; Point -> String
+ point->string
  )
 
 ;; a point represents an x y coordinate
@@ -111,3 +113,8 @@
         (cons (translate p -1 0) 'west
               )
         (cons (translate p 0 -1) 'north)))
+
+;; Point -> String
+;; formats string as x,y
+(define (point->string p)
+  (format "(~a,~a)" (point-x p) (point-y p)))
