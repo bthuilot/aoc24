@@ -60,7 +60,7 @@ Below is an index to every completed day's implementation source code (containin
 <!-- - [Day 15](private/days/15.rkt) : [Problem](https://adventofcode.com/2024/day/15) -->
 - [Day 16](private/days/16.rkt) : [Problem](https://adventofcode.com/2024/day/16)
 <!-- - [Day 17](private/days/17.rkt) : [Problem](https://adventofcode.com/2024/day/17) -->
-<!-- - [Day 18](private/days/18.rkt) : [Problem](https://adventofcode.com/2024/day/18) -->
+- [Day 18](private/days/18.rkt) : [Problem](https://adventofcode.com/2024/day/18)
 <!-- - [Day 19](private/days/19.rkt) : [Problem](https://adventofcode.com/2024/day/19) -->
 <!-- - [Day 20](private/days/20.rkt) : [Problem](https://adventofcode.com/2024/day/20) -->
 <!-- - [Day 21](private/days/21.rkt) : [Problem](https://adventofcode.com/2024/day/21) -->
