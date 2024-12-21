@@ -31,7 +31,7 @@
 
 (define (remove-pq q i)
   (cond
-    [(empty? pq) q]
+    [(empty? q) q]
     [(equal? (pq-i (car q)) i) (cdr q)]
     [else (cons (car q) (remove-pq (cdr q) i))]))
 

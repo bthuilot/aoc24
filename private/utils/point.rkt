@@ -43,6 +43,12 @@
 
  ;; Point -> String
  point->string
+
+ ;; Point Number -> [Listof Point]
+ manhattan-distance-points
+
+ ;; Point -> (values Number Number)
+ unpack-point
  )
 
 ;; a point represents an x y coordinate
@@ -114,7 +120,40 @@
               )
         (cons (translate p 0 -1) 'north)))
 
+(define (unpack-point p)
+  (values (point-x p) (point-y p)))
+
+(define (manhattan-distance-points p dist)
+  (define-values (x y) (unpack-point p))
+  (apply append
+         (build-list dist
+                     (λ (offset)
+                       (define inv-offset (- dist offset))
+                       (list (point (+ x offset) (+ y inv-offset))
+                             (point (+ x inv-offset) (- y offset))
+                             (point (- x offset) (- y inv-offset))
+                             (point (- x inv-offset) (+ y offset))
+                             )))))
 ;; Point -> String
 ;; formats string as x,y
 (define (point->string p)
   (format "(~a,~a)" (point-x p) (point-y p)))
+
+(module+ test
+  (require rackunit)
+
+  (check-equal? (manhattan-distance-points (point 3 3) 3)
+                (list
+                 (point 3 6)
+                 (point 6 3)
+                 (point 3 0)
+                 (point 0 3)
+                 (point 4 5)
+                 (point 5 2)
+                 (point 2 1)
+                 (point 1 4)
+                 (point 5 4)
+                 (point 4 1)
+                 (point 1 2)
+                 (point 2 5)))
+  )
