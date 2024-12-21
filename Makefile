@@ -5,12 +5,12 @@ ENTRY_POINT = main.rkt
 .PHONY: all clean run test
 
 all:
-	raco make $(ENTRY_POINT)
+	@raco make $(ENTRY_POINT)
 clean:
-	rm -f $(DEP_FILES) $(BYTECODE_FILES)
+	@rm -f $(DEP_FILES) $(BYTECODE_FILES)
 
 run: all
-	racket $(ENTRY_POINT)
+	@racket $(ENTRY_POINT)
 
 test: all
-	raco test .
+	@raco test .
